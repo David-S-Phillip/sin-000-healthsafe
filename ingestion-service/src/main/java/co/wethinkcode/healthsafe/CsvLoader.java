@@ -14,7 +14,7 @@ public class CsvLoader {
     }
 
     public List<String> loadLines() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("wards-outdated.csv");
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName);
 
         if (inputStream == null) {
             throw new IllegalArgumentException("Resource not found: " + fileName);
