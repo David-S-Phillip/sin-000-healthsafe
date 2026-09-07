@@ -12,8 +12,8 @@ public class WardCleanerTest {
 
         WardRecord record = cleaner.cleanSingleLine("w-05,east wing ,PAEDIATRICS,10");
         Assertions.assertEquals("W-05", record.wardId());
-        Assertions.assertEquals("East Wing", recprd.wing());
-        Assertions.assertEquals("Paediatrics", record.department());
+        Assertions.assertEquals("East Wing", record.wing());
+        Assertions.assertEquals("Paediatrics", record.getDepartment());
         Assertions.assertEquals(10, record.bedsAvailable());
         assertNull(record.notes());
     }
