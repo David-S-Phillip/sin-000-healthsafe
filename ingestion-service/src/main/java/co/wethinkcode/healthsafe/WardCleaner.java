@@ -28,14 +28,14 @@ public class WardCleaner {
             }
 
             WardRecord incoming = cleanSingleLine(line);
-            if (incoming.wardId() == null) continue;
+            if (incoming.getWardId() == null) continue;
 
-            if (!recordMap.containsKey(incoming.wardId())) {
-                recordMap.put(incoming.wardId(), incoming);
+            if (!recordMap.containsKey(incoming.getWardId())) {
+                recordMap.put(incoming.getWardId(), incoming);
             } else {
                 // Duplicate found: merge missing fields & add duplicate note
-                WardRecord existing = recordMap.get(incoming.wardId());
-                recordMap.put(incoming.wardId(), mergeRecords(existing, incoming));
+                WardRecord existing = recordMap.get(incoming.getWardId());
+                recordMap.put(incoming.getWardId(), mergeRecords(existing, incoming));
             }
         }
 
@@ -74,18 +74,18 @@ public class WardCleaner {
     }
 
     private WardRecord mergeRecords(WardRecord existing, WardRecord incoming) {
-        String mergedWing = (existing.wing() != null) ? existing.wing() : incoming.wing();
+        String mergedWing = (existing.getWing() != null) ? existing.getWing() : incoming.getWing();
         String mergedDept = (existing.getDepartment() != null) ? existing.getDepartment() : incoming.getDepartment();
-        Integer mergedBeds = (existing.bedsAvailable() != null) ? existing.bedsAvailable() : incoming.bedsAvailable();
+        Integer mergedBeds = (existing.getBedsAvailable() != null) ? existing.getBedsAvailable() : incoming.getBedsAvailable();
 
-        String mergedNotes = existing.notes();
+        String mergedNotes = existing.getNotes();
         if (mergedNotes == null) {
             mergedNotes = "Duplicate record detected; merged available fields.";
         } else {
             mergedNotes += " | Duplicate record detected; merged available fields.";
         }
 
-        return new WardRecord(existing.wardId(), mergedWing, mergedDept, mergedBeds, mergedNotes);
+        return new WardRecord(existing.getWardId(), mergedWing, mergedDept, mergedBeds, mergedNotes);
     }
 
     private String cleanText(String[] fields, int index) {

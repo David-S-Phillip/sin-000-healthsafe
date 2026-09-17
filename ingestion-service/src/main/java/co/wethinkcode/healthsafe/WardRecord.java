@@ -15,11 +15,11 @@ public class WardRecord {
         this.notes = notes;
     }
 
-    public String wardId(){
+    public String getWardId(){
         return this.wardId;
     }
 
-    public String wing(){
+    public String getWing(){
         return this.wing;
     }
 
@@ -27,11 +27,11 @@ public class WardRecord {
         return this.department;
     }
 
-    public Integer bedsAvailable(){
+    public Integer getBedsAvailable(){
         return this.bedsAvailable;
     }
 
-    public String notes(){
+    public String getNotes(){
         return this.notes;
     }
 }

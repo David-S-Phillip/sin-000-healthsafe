@@ -9,10 +9,10 @@ class WardRecordTest {
     void testWardRecordInitializationAndGetters() {
         WardRecord record = new WardRecord("W-05", "East Wing", "Paediatrics", null, "bedsAvailable was non-numeric");
 
-        assertEquals("W-05", record.wardId());
-        assertEquals("East Wing", record.wing());
+        assertEquals("W-05", record.getWardId());
+        assertEquals("East Wing", record.getWing());
         assertEquals("Paediatrics", record.getDepartment());
-        assertNull(record.bedsAvailable());
-        assertEquals("bedsAvailable was non-numeric", record.notes());
+        assertNull(record.getBedsAvailable());
+        assertEquals("bedsAvailable was non-numeric", record.getNotes());
     }
 }
