@@ -93,3 +93,16 @@ curl http://localhost:7030/health   # -> OK
 
 To add real tests, add JUnit 5 + the Surefire plugin to `pom.xml`, put tests under
 `src/test/java/co/wethinkcode/healthsafe/`, and run `mvn test`.
+
+
+## Use cUrl to test the api responses 
+***first ensure the server is running brudda***
+***This is to test if the server accepts the connection and sends back a OK 200***
+```bash
+curl -v http://localhost:7030/health
+```
+
+***This is to test if the csv data is being sent***
+```bash
+curl -s http://localhost:7030/wards
+```

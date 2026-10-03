@@ -8,6 +8,9 @@ public class WardRecord {
     String notes;
 
     public WardRecord(String wardId, String wing, String department, Integer bedsAvailable, String notes){
+        if (wardId == null || wardId.trim().isEmpty()){
+            throw new IllegalArgumentException("Ward If cannot be empty or null");
+        }
         this.wardId = wardId;
         this.wing = wing;
         this.department = department;

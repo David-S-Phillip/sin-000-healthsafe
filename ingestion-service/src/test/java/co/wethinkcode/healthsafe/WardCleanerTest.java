@@ -1,7 +1,8 @@
 package co.wethinkcode.healthsafe;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;import static org.junit.jupiter.api.Assertions.assertNull;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class WardCleanerTest {
 
@@ -11,11 +12,11 @@ public class WardCleanerTest {
         WardCleaner cleaner = new WardCleaner();
 
         WardRecord record = cleaner.cleanSingleLine("w-05,east wing ,PAEDIATRICS,10");
-        Assertions.assertEquals("W-05", record.wardId());
-        Assertions.assertEquals("East Wing", record.wing());
+        Assertions.assertEquals("W-05", record.getWardId());
+        Assertions.assertEquals("East Wing", record.getWing());
         Assertions.assertEquals("Paediatrics", record.getDepartment());
-        Assertions.assertEquals(10, record.bedsAvailable());
-        assertNull(record.notes());
+        Assertions.assertEquals(10, record.getBedsAvailable());
+        assertNull(record.getNotes());
     }
 
     @Test
@@ -25,10 +26,10 @@ public class WardCleanerTest {
 
         WardRecord record = cleaner.cleanSingleLine("w-05,east wing ,PAEDIATRICS,five");
 
-        Assertions.assertEquals("W-05", record.wardId());
-        assertNull(record.bedsAvailable());
-        Assertions.assertNotNull(record.notes());
-        Assertions.assertTrue(record.notes().contains("non-numeric"));
+        Assertions.assertEquals("W-05", record.getWardId());
+        assertNull(record.getBedsAvailable());
+        Assertions.assertNotNull(record.getNotes());
+        Assertions.assertTrue(record.getNotes().contains("non-numeric"));
     }
 
     @Test
@@ -38,8 +39,8 @@ public class WardCleanerTest {
 
         WardRecord record = cleaner.cleanSingleLine("w-05, N/A ,PAEDIATRICS,TBD");
 
-        Assertions.assertNull(record.wing());
-        Assertions.assertNull(record.bedsAvailable());
+        Assertions.assertNull(record.getWing());
+        Assertions.assertNull(record.getBedsAvailable());
     }
 
 }
