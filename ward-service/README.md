@@ -46,3 +46,38 @@ curl http://localhost:7031/health   # -> OK
 
 To add real tests, add JUnit 5 + the Surefire plugin to `pom.xml`, put tests under
 `src/test/java/co/wethinkcode/healthsafe/`, and run `mvn test`.
+
+## API Endpoints
+### cURL commands to ensure the api endpoints work as intended 
+You can test the running server using the following `curl` commands.
+*Note: If you are on Linux/macOS, you can pipe the output to `jq` (e.g., `curl -s http://localhost:7031/wards | jq`) to pretty-print the JSON response.*
+**First start up the ingestion-service server**
+
+**Check Server Health**
+```bash
+curl -X GET http://localhost:7031/health
+```
+
+**Get all wards**
+```bash
+curl -X GET http://localhost:7031/wards
+```
+
+**Get a specific ward by id**
+replace "TEST-1" with a valid ID from the csv file
+```bash
+curl -X GET http://localhost:7031/wards/TEST-1
+```
+
+**Get a specific ward that does not exist and see the Error 404**
+```bash
+curl -i -X GET http://localhost:7031/wards/INVALID-ID
+```
+
+**Get all unique departments**
+```bash
+curl -X GET http://localhost:7031/departments
+```
+
+
+
