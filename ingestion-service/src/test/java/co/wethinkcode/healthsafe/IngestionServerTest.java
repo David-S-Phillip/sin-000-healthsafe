@@ -64,4 +64,30 @@ public class IngestionServerTest {
         // (Assuming W-05 is one of the cleaned IDs from your file)
         assertTrue(responseBody.contains("W-05"), "Response should contain cleaned ward W-05");
     }
+
+
+    @Test
+    public void testInvalidNumberIsHandledGracefully() throws Exception {
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("http://localhost:" + TEST_PORT + "/wards"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        // 1. Ensure the request succeeded
+        assertEquals(200, response.statusCode());
+
+        String responseBody = response.body();
+
+        // 2. Assert that the non-numeric input ("five") didn't crash the server,
+        // but instead caught the exception and added the warning note to the JSON output.
+        assertTrue(responseBody.contains("bedsAvailable was non-numeric"),
+                "Response should flag non-numeric bed values");
+
+        // 3. Verify that bedsAvailable for that specific entry translates to null in JSON (which appears as null)
+        assertTrue(responseBody.contains("\"bedsAvailable\":null"),
+                "Beds available should be set to null when invalid");
+    }
 }
