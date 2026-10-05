@@ -1,6 +1,7 @@
 package co.wethinkcode.healthsafe;
 import co.wethinkcode.healthsafe.client.ClientRequest;
 
+import co.wethinkcode.healthsafe.server.WardApiServer;
 import io.javalin.Javalin;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,40 +19,9 @@ public class WardServiceApp {
         List<WardRecord> hospitalWards = csvInformation.fetchWards();
 //        System.out.println("Loaded " + hospitalWards.size() + " wards.");
 
+        WardApiServer server = new WardApiServer(hospitalWards);
 
-        Javalin app = Javalin.create().start(7031);
-
-        app.get("/health", ctx -> ctx.result("OK"));
-
-        // TODO (Provides lists of wards and departments.)
-        // Add domain endpoints for ward-service here.
-        app.get("/wards", ctx -> {
-            ctx.json(hospitalWards);
-        });
-
-        app.get("/wards/{id}", ctx -> {
-            String targetId = ctx.pathParam("id");
-
-            WardRecord foundWard = hospitalWards.stream()
-                    .filter(ward -> targetId.equals(ward.getWardId()))
-                    .findFirst()
-                    .orElse(null);
-
-            if (foundWard != null){
-                ctx.json(foundWard);
-            }else{
-                ctx.status(404).result("Ward not found");
-            }
-        });
-
-        app.get("/departments", ctx -> {
-            List<String> departments = hospitalWards.stream()
-                    .map(WardRecord::getDepartment)
-                    .distinct()
-                    .toList();
-
-                    ctx.json(departments);
-        });
+        server.start(7031);
     }
 }
 
