@@ -35,6 +35,14 @@
     <version>2.15.0</version>
   </dependency>
 
+    <!-- Source: https://mvnrepository.com/artifact/junit/junit -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.10.2</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
   <build>
     <finalName>alert-level-service</finalName>
