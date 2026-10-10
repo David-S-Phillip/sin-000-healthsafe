@@ -1,4 +1,5 @@
 package co.wethinkcode.healthsafe.server;
+import co.wethinkcode.healthsafe.client.StaffingServiceClient;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.javalin.Javalin;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,74 +13,42 @@ import java.util.Map;
 
 public class StaffingServiceServer {
     private final Javalin app;
-    private final HttpClient httpClient;
-    private final ObjectMapper objectMapper;
+    private final StaffingServiceClient clientResponse;
 
     public StaffingServiceServer() {
         this.app = Javalin.create();
-        this.httpClient = HttpClient.newHttpClient();
-        this.objectMapper = new ObjectMapper();
+        this.clientResponse = new StaffingServiceClient();
         setupRoutes();
+
     }
 
     private void setupRoutes() {
-        // Health check required by README
         app.get("/health", ctx -> ctx.result("OK"));
 
-        // Main scheduling endpoint
         app.get("/schedule/{wardId}", ctx -> {
             String wardId = ctx.pathParam("wardId");
 
-            // 1. Validate Ward via ward-service (Port 7031)
-            try {
-                HttpRequest wardRequest = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:7031/wards/" + wardId))
-                        .GET()
-                        .build();
+            // 1. Validate Ward
+            boolean doesWardExist = clientResponse.checkWardExists(wardId);
 
-                HttpResponse<String> wardResponse = httpClient.send(wardRequest, HttpResponse.BodyHandlers.ofString());
-
-                if (wardResponse.statusCode() == 404) {
-                    ctx.status(404).result("Ward not found: " + wardId);
-                    return;
-                } else if (wardResponse.statusCode() != 200) {
-                    ctx.status(502).result("Error communicating with ward-service");
-                    return;
-                }
-            } catch (Exception e) {
-                ctx.status(503).result("Ward service unavailable");
+            // If the ward doesn't exist (or the network crashed), bounce the request immediately
+            if (!doesWardExist) {
+                ctx.status(404).result("Ward not found or ward-service unavailable.");
                 return;
             }
 
-            // 2. Fetch Emergency Status via alert-level-service (Port 7032)
-            int alertLevel = 0;
-            try {
-                HttpRequest alertRequest = HttpRequest.newBuilder()
-                        .uri(URI.create("http://localhost:7032/alert-level"))
-                        .GET()
-                        .build();
+            // 2. Fetch Emergency Status
+            int alertLevel = clientResponse.alertLevel();
 
-                HttpResponse<String> alertResponse = httpClient.send(alertRequest, HttpResponse.BodyHandlers.ofString());
-
-                if (alertResponse.statusCode() == 200) {
-                    // Parse JSON: { "level": X }
-                    Map<String, Object> alertJson = objectMapper.readValue(alertResponse.body(), new TypeReference<Map<String, Object>>() {});
-                    if (alertJson.containsKey("level") && alertJson.get("level") instanceof Number) {
-                        alertLevel = ((Number) alertJson.get("level")).intValue();
-                    }
-                }
-            } catch (Exception e) {
-                // Fallback or default alert level if service lags
+            // If the alert level fetch failed (returned -1), we default to 0 to keep the hospital running
+            if (alertLevel == -1) {
                 alertLevel = 0;
             }
 
-            // 3. Compute Schedule based on ward and alert level
+            // 3. Compute Schedule
             String scheduleSummary = computeSchedule(wardId, alertLevel);
 
-            // 4. Publish to ActiveMQ topic (staffing-events-topic) if MQ config is present
-            // (You can wire up your MqConfig publisher here for Stage 3)
-
-            // Return the computed schedule result
+            // 4. Return the computed schedule result as JSON (You deleted this!)
             ctx.json(Map.of(
                     "wardId", wardId,
                     "alertLevel", alertLevel,
@@ -87,6 +56,7 @@ public class StaffingServiceServer {
             ));
         });
     }
+
 
     private String computeSchedule(String wardId, int alertLevel) {
         if (alertLevel >= 6) {
