@@ -1,6 +1,7 @@
 package co.wethinkcode.healthsafe;
 import co.wethinkcode.healthsafe.client.ClientRequest;
 
+import co.wethinkcode.healthsafe.mq.WardMqHandler;
 import co.wethinkcode.healthsafe.server.WardApiServer;
 import io.javalin.Javalin;
 import java.net.URI;
@@ -22,8 +23,12 @@ public class WardServiceApp {
         WardApiServer server = new WardApiServer(hospitalWards);
 
         server.start(7031);
+
+
+        // MQ TODO: subscribes to ActiveMQ topic MqConfig.TOPIC at MqConfig.BROKER_URL (see co.wethinkcode.healthsafe.mq.MqConfig)
+        WardMqHandler mqHandler = new WardMqHandler();
+        mqHandler.startListening();
+
+// MQ TODO: publishes to ActiveMQ queue MqConfig.QUEUE when it detects an equipment failure on one of its wards.
     }
 }
-
-// MQ TODO: subscribes to ActiveMQ topic MqConfig.TOPIC at MqConfig.BROKER_URL (see co.wethinkcode.healthsafe.mq.MqConfig)
-// MQ TODO: publishes to ActiveMQ queue MqConfig.QUEUE when it detects an equipment failure on one of its wards.
