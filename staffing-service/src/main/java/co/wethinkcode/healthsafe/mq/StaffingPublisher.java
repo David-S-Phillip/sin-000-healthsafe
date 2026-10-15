@@ -11,6 +11,11 @@ public class StaffingPublisher {
         this.connectionFactory = new ActiveMQConnectionFactory(MqConfig.BROKER_URL);
     }
 
+    // The test constructor (constructor overloading)
+    public StaffingPublisher(ConnectionFactory connectionFactory){
+        this.connectionFactory = connectionFactory;
+    }
+
     public void publishUpdate(String jsonPayload) {
 
         try {
