@@ -1,5 +1,6 @@
 package co.wethinkcode.healthsafe;
 
+import co.wethinkcode.healthsafe.mq.StaffingPublisher;
 import co.wethinkcode.healthsafe.server.StaffingServiceServer;
 import io.javalin.Javalin;
 
@@ -8,10 +9,11 @@ public class StaffingServiceApp {
     public static void main(String[] args) {
         StaffingServiceServer server = new StaffingServiceServer();
         server.start(7033);
-
+        System.out.println("[Staffing-service] Running on http://localhost:7033");
 
         // TODO (Provides on-call schedules for doctors based on ward and status.)
         // Add domain endpoints for staffing-service here.
+        // instantiate the ActiveMQ publisher
     }
 }
 

@@ -1,5 +1,6 @@
 package co.wethinkcode.healthsafe.server;
 import co.wethinkcode.healthsafe.client.StaffingServiceClient;
+import co.wethinkcode.healthsafe.mq.StaffingPublisher;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.javalin.Javalin;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,10 +15,12 @@ import java.util.Map;
 public class StaffingServiceServer {
     private final Javalin app;
     private final StaffingServiceClient clientResponse;
+    private final StaffingPublisher publisher;
 
     public StaffingServiceServer() {
         this.app = Javalin.create();
         this.clientResponse = new StaffingServiceClient();
+        this.publisher = new StaffingPublisher();
         setupRoutes();
 
     }
@@ -54,6 +57,21 @@ public class StaffingServiceServer {
                     "alertLevel", alertLevel,
                     "schedule", scheduleSummary
             ));
+        });
+
+        app.post("/staffing", ctx -> {
+            String jsonPayload = ctx.body();
+
+            if (jsonPayload == null || jsonPayload.isBlank()){
+                ctx.status(400).result("Error: Request body cannot be empty");
+                return;
+            }
+
+            // publish to ActiveMq topic via your publisher
+            publisher.publishUpdate(jsonPayload);
+
+            // 202 accepted indicates asynchronous handoff
+            ctx.status(202).result("Staffing update published succesfully");
         });
     }
 
