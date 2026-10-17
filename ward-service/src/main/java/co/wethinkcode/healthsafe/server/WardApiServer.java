@@ -1,6 +1,7 @@
 package co.wethinkcode.healthsafe.server;
 
 import co.wethinkcode.healthsafe.WardRecord;
+import co.wethinkcode.healthsafe.mq.EquipmentFailurePublisher;
 import io.javalin.Javalin;
 
 import java.util.List;
@@ -8,9 +9,11 @@ import java.util.List;
 public class WardApiServer {
     private final Javalin app;
     private final List<WardRecord> hospitalWards;
+    private final EquipmentFailurePublisher failurePublisher;
 
     public WardApiServer(List<WardRecord> hospitalWards){
         this.hospitalWards = hospitalWards;
+        this.failurePublisher = new EquipmentFailurePublisher();
         this.app = Javalin.create();
         setupRoutes();
     }
@@ -45,6 +48,20 @@ public class WardApiServer {
                     .distinct()
                     .toList();
             ctx.json(departments);
+        });
+
+        // Endpoint where equipment failures are reported to ward-service
+        app.post("/equipment-failure", ctx -> {
+            String payload = ctx.body();
+
+            if (payload == null || payload.isBlank()){
+                ctx.status(400).result("Error: Equipment failure payload cannot be empty");
+                return;
+            }
+
+            // publish failure event to the queue
+            failurePublisher.sendFailureAlert(payload);
+            ctx.status(202).result("Equipment failure alert queued successfully");
         });
 
     }
