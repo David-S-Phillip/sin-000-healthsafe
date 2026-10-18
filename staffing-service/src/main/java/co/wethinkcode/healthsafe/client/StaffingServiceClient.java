@@ -18,6 +18,12 @@ public class StaffingServiceClient {
         this.mapper = new ObjectMapper();
     }
 
+    // Overload constructor for unit testing
+    public StaffingServiceClient(HttpClient httpClient){
+        this.httpClient = httpClient;
+        this.mapper = new ObjectMapper();
+    }
+
     public boolean checkWardExists(String wardId) {
         try {
             HttpResponse<String> response = httpResponse("http://localhost:7031/wards/" + wardId);

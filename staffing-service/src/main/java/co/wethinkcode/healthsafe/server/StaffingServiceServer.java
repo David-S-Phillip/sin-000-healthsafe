@@ -25,6 +25,14 @@ public class StaffingServiceServer {
 
     }
 
+    // overload constructor for unit testing
+    public StaffingServiceServer(StaffingServiceClient clientResponse, StaffingPublisher publisher){
+        this.app = Javalin.create();
+        this.clientResponse = clientResponse;
+        this.publisher = publisher;
+        setupRoutes();
+    }
+
     private void setupRoutes() {
         app.get("/health", ctx -> ctx.result("OK"));
 
